@@ -16,7 +16,7 @@ Copyright 2020 Taoidle
 
 """
 
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QSlider, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QSlider, QHBoxLayout, QVBoxLayout, QGridLayout
 from PyQt5.QtCore import Qt
 
 
@@ -60,7 +60,6 @@ class VideoConsole(QWidget):
         self.vbox.addWidget(self.play_slider)
         self.vbox.addWidget(self.button_hbox_wid_1)
         self.vbox.addWidget(self.button_hbox_wid_2)
-
         self.setLayout(self.vbox)
 
 
@@ -72,25 +71,33 @@ class VideoInfo(QWidget):
 
     def init_ui(self):
         self.security_status_label = QLabel('视频保护：')
+        self.security_status_label.setMaximumHeight(20)
         self.security_status_show_label = QLabel('')
-        self.security_status_hbox = QHBoxLayout()
-        self.security_status_hbox.addWidget(self.security_status_label)
-        self.security_status_hbox.addWidget(self.security_status_show_label)
-        self.security_status_hbox_wid = QWidget()
-        self.security_status_hbox_wid.setLayout(self.security_status_hbox)
+        self.security_status_show_label.setMaximumHeight(20)
 
         self.vid_time_len_label = QLabel('视频时长：')
+        self.vid_time_len_label.setMaximumHeight(20)
         self.vid_time_len_show_label = QLabel('')
-        self.vid_time_len_hbox = QHBoxLayout()
-        self.vid_time_len_hbox.addWidget(self.vid_time_len_label)
-        self.vid_time_len_hbox.addWidget(self.vid_time_len_show_label)
-        self.vid_time_len_hbox_wid = QWidget()
-        self.vid_time_len_hbox_wid.setLayout(self.vid_time_len_hbox)
+        self.vid_time_len_show_label.setMaximumHeight(20)
 
+        self.vid_resolution_label = QLabel('分辨率：')
+        self.vid_resolution_label.setMaximumHeight(20)
+        self.vid_resolution_show_label = QLabel('')
+        self.vid_resolution_show_label.setMaximumHeight(20)
 
+        self.vid_fps_label = QLabel('帧率：')
+        self.vid_fps_label.setMaximumHeight(20)
+        self.vid_fps_show_label = QLabel('')
+        self.vid_fps_show_label.setMaximumHeight(20)
 
-        self.vbox = QVBoxLayout()
-        self.vbox.addWidget(self.security_status_hbox_wid)
-        self.vbox.addWidget(self.vid_time_len_hbox_wid)
-
-        self.setLayout(self.vbox)
+        self.gbox = QGridLayout()
+        self.gbox.setSpacing(0)
+        self.gbox.addWidget(self.security_status_label, 1, 1)
+        self.gbox.addWidget(self.security_status_show_label, 1, 2)
+        self.gbox.addWidget(self.vid_time_len_label, 2, 1)
+        self.gbox.addWidget(self.vid_time_len_show_label, 2, 2)
+        self.gbox.addWidget(self.vid_resolution_label, 3, 1)
+        self.gbox.addWidget(self.vid_resolution_show_label, 3, 2)
+        self.gbox.addWidget(self.vid_fps_label, 4, 1)
+        self.gbox.addWidget(self.vid_fps_show_label, 4, 2)
+        self.setLayout(self.gbox)

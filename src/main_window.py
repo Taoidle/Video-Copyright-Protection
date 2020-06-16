@@ -15,8 +15,8 @@ Copyright 2020 Taoidle
    limitations under the License.
 
 """
-import sys, ui, cv2
 
+import sys, ui, cv2
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaMetaData
 from PyQt5.QtMultimediaWidgets import QVideoWidget
@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         self.video_wid = QVideoWidget()
         self.video_wid.setMinimumSize(360, 240)
+        self.vid_player = QMediaPlayer()
 
         self.video_console = ui.VideoConsole()
         self.video_console.pause_button.clicked.connect(self.video_status)
@@ -73,17 +74,19 @@ class MainWindow(QMainWindow):
         self.vid_reader = cv2.VideoCapture(url)
         ret_tmp, tmp = self.vid_reader.read()
         tmp_height, tmp_width, tmp_channel = tmp.shape
+        vid_time_sum = self.vid_reader.get(cv2.CAP_PROP_FRAME_COUNT) / self.vid_reader.get(
+            cv2.CAP_PROP_FPS) / 60
+        vid_time_min = self.vid_reader.get(cv2.CAP_PROP_FRAME_COUNT) / self.vid_reader.get(
+            cv2.CAP_PROP_FPS) // 60
+        vid_time_sec = (vid_time_sum - vid_time_min) * 60
+        self.video_info.vid_time_len_show_label.setText(str(int(vid_time_min)) + '分' + str(int(vid_time_sec)) + '秒')
+        self.video_info.vid_resolution_show_label.setText(str(tmp_width) + ' x ' + str(tmp_height))
+        self.video_info.vid_fps_show_label.setText(str(round(self.vid_reader.get(cv2.CAP_PROP_FPS), 2)))
         self.video_wid.setMinimumSize(tmp_width, tmp_height)
-        self.vid_player = QMediaPlayer()
-        self.vid_player.audioAvailableChanged.connect(self.print_info)
         self.vid_player.setVideoOutput(self.video_wid)
         self.vid_player.setMedia(QMediaContent(QUrl.fromLocalFile(url)))
         self.vid_status = True
         self.vid_player.play()
-
-    def print_info(self):
-        # print(str(self.vid_player.metaData(QMediaMetaData.Size)))
-        pass
 
     def video_status(self):
         if self.vid_status is True:
