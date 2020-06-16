@@ -20,11 +20,12 @@ import sys, ui, cv2
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaMetaData
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWidgets import QApplication, QFileDialog, QWidget, QMainWindow, QGridLayout, QVBoxLayout, QAction
+from PyQt5.QtWidgets import QApplication, QFileDialog, QWidget, QMainWindow, QGridLayout, QVBoxLayout, QAction,QHBoxLayout
 
 
 class MainWindow(QMainWindow):
     vid_status = False
+    window_max_screen_status = False
 
     def __init__(self):
         super().__init__()
@@ -39,13 +40,22 @@ class MainWindow(QMainWindow):
         self.video_console.pause_button.clicked.connect(self.video_status)
         self.video_console.pause_button.setShortcut('space')
         self.video_console.stop_button.clicked.connect(self.video_stop)
+        self.video_console.max_screen_button.clicked.connect(self.set_max_screen)
+        self.video_console.full_screen_button.clicked.connect(self.set_full_screen)
 
         self.video_info = ui.VideoInfo()
 
+        self.vid_footer_hbox = QHBoxLayout()
+        self.vid_footer_hbox.addWidget(self.video_console)
+        self.vid_footer_hbox.addWidget(self.video_info)
+        self.vid_footer_hbox_wid = QWidget()
+        self.vid_footer_hbox_wid.setLayout(self.vid_footer_hbox)
+        self.vid_footer_hbox_wid.setMaximumHeight(160)
+
         self.gbox = QGridLayout()
-        self.gbox.addWidget(self.video_wid, 1, 1, 1, 2)
-        self.gbox.addWidget(self.video_console, 2, 1)
-        self.gbox.addWidget(self.video_info, 2, 2)
+        self.gbox.addWidget(self.video_wid, 1, 1)
+        self.gbox.addWidget(self.vid_footer_hbox_wid, 2, 1)
+
 
         self.main_wid = QWidget()
         self.main_wid.setLayout(self.gbox)
@@ -71,6 +81,13 @@ class MainWindow(QMainWindow):
         self.play_video(file_name)
 
     def play_video(self, url):
+        self.set_vid_info(url)
+        self.vid_player.setVideoOutput(self.video_wid)
+        self.vid_player.setMedia(QMediaContent(QUrl.fromLocalFile(url)))
+        self.vid_status = True
+        self.vid_player.play()
+
+    def set_vid_info(self, url):
         self.vid_reader = cv2.VideoCapture(url)
         ret_tmp, tmp = self.vid_reader.read()
         tmp_height, tmp_width, tmp_channel = tmp.shape
@@ -83,10 +100,6 @@ class MainWindow(QMainWindow):
         self.video_info.vid_resolution_show_label.setText(str(tmp_width) + ' x ' + str(tmp_height))
         self.video_info.vid_fps_show_label.setText(str(round(self.vid_reader.get(cv2.CAP_PROP_FPS), 2)))
         self.video_wid.setMinimumSize(tmp_width, tmp_height)
-        self.vid_player.setVideoOutput(self.video_wid)
-        self.vid_player.setMedia(QMediaContent(QUrl.fromLocalFile(url)))
-        self.vid_status = True
-        self.vid_player.play()
 
     def video_status(self):
         if self.vid_status is True:
@@ -99,6 +112,16 @@ class MainWindow(QMainWindow):
     def video_stop(self):
         self.vid_player.stop()
 
+    def set_max_screen(self):
+        if self.window_max_screen_status:
+            self.setWindowState(Qt.WindowNoState)
+            self.window_max_screen_status = False
+        else:
+            self.setWindowState(Qt.WindowMaximized)
+            self.window_max_screen_status = True
+
+    def set_full_screen(self):
+        self.showFullScreen()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
