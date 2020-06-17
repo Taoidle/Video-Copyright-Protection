@@ -16,7 +16,8 @@ Copyright 2020 Taoidle
 
 """
 
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QSlider, QHBoxLayout, QVBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QRadioButton, QSlider, QHBoxLayout, QVBoxLayout, QGridLayout, \
+    QLineEdit, QFileDialog, QDesktopWidget
 from PyQt5.QtCore import Qt
 
 
@@ -101,3 +102,74 @@ class VideoInfo(QWidget):
         self.gbox.addWidget(self.vid_fps_label, 4, 1)
         self.gbox.addWidget(self.vid_fps_show_label, 4, 2)
         self.setLayout(self.gbox)
+
+
+class SettingsWindow(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        self.copyright_words_label = QLabel('版权文字信息')
+        self.copyright_words_textline = QLineEdit(self)
+        self.copyright_pic_label = QLabel('版权图片信息')
+        self.copyright_pic_path = QLineEdit(self)
+        self.copyright_pic_path_button = QPushButton('选择图片')
+        # self.copyright_pic_path_button.clicked.connect(self.get_path)
+
+        self.copyright_info_label = QLabel('版权保护设置')
+        self.copyright_info_words = QRadioButton('版权文字')
+        self.copyright_info_pic = QRadioButton('版权图片')
+        self.copyright_info_words_pic = QRadioButton('版权文字+图片')
+        self.copyright_info_hbox = QHBoxLayout()
+        self.copyright_info_hbox.addWidget(self.copyright_info_words)
+        self.copyright_info_hbox.addWidget(self.copyright_info_pic)
+        self.copyright_info_hbox.addWidget(self.copyright_info_words_pic)
+        self.copyright_info_hbox_wid = QWidget()
+        self.copyright_info_hbox_wid.setLayout(self.copyright_info_hbox)
+
+        self.check_hbox = QHBoxLayout()
+        self.check_hbox_wid = QWidget()
+        self.cancel_button = QPushButton('取消')
+        self.cancel_button.clicked.connect(self.cancelEvent)
+        self.ok_button = QPushButton('确定')
+        self.ok_button.clicked.connect(self.closeEvent)
+        self.check_hbox.addWidget(self.cancel_button)
+        self.check_hbox.addWidget(self.ok_button)
+        self.check_hbox_wid.setLayout(self.check_hbox)
+
+        self.gbox = QGridLayout()
+        self.gbox.addWidget(self.copyright_words_label, 1, 1, 1, 1)
+        self.gbox.addWidget(self.copyright_words_textline, 2, 1, 1, 4)
+        self.gbox.addWidget(self.copyright_pic_label, 3, 1)
+        self.gbox.addWidget(self.copyright_pic_path, 4, 1, 1, 3)
+        self.gbox.addWidget(self.copyright_pic_path_button, 4, 4, 1, 1)
+        self.gbox.addWidget(self.copyright_info_label, 5, 1, 1, 1)
+        self.gbox.addWidget(self.copyright_info_hbox_wid, 6, 1, 1, 4)
+        self.gbox.addWidget(self.check_hbox_wid, 7, 1, 1, 4)
+
+        self.setWindowTitle('设置')
+        self.setWindowFlags(Qt.WindowMinimizeButtonHint)
+        self.setWindowModality(Qt.ApplicationModal)
+        self.setLayout(self.gbox)
+        self.show()
+        self.center()
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
+    def get_path(self):
+        file_name, tmp = QFileDialog.getOpenFileName(self, '打开图片', 'picture', '*.png *.jpg *.bmp')
+        if file_name == '':
+            return
+        self.copyright_pic_path.setText(file_name)
+
+    def cancelEvent(self):
+        self.close()
+
+    def closeEvent(self, event):
+        self.close()

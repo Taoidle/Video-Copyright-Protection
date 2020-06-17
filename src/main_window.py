@@ -20,7 +20,8 @@ import sys, ui, cv2
 from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaMetaData
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWidgets import QApplication, QFileDialog, QWidget, QMainWindow, QGridLayout, QVBoxLayout, QAction,QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QFileDialog, QWidget, QMainWindow, QGridLayout, QVBoxLayout, QAction, \
+    QHBoxLayout, QDesktopWidget
 
 
 class MainWindow(QMainWindow):
@@ -56,7 +57,6 @@ class MainWindow(QMainWindow):
         self.gbox.addWidget(self.video_wid, 1, 1)
         self.gbox.addWidget(self.vid_footer_hbox_wid, 2, 1)
 
-
         self.main_wid = QWidget()
         self.main_wid.setLayout(self.gbox)
         self.setCentralWidget(self.main_wid)
@@ -66,12 +66,20 @@ class MainWindow(QMainWindow):
         open_vid.triggered.connect(self.open_video)
         open_vid.setShortcut('Ctrl+O')
 
+        # 设置
+        program_setting = QAction('设置', self)
+        program_setting.triggered.connect(self.settings)
+
         # 添加File菜单&子菜单
         file_menubar = self.menuBar()
         file_menu = file_menubar.addMenu('文件')
         file_menu.addAction(open_vid)
+        file_menu.addAction(program_setting)
 
         self.show()
+
+    def settings(self):
+        self.setting_window = ui.SettingsWindow()
 
     def open_video(self):
         # 调用存储文件
@@ -122,6 +130,7 @@ class MainWindow(QMainWindow):
 
     def set_full_screen(self):
         self.showFullScreen()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
